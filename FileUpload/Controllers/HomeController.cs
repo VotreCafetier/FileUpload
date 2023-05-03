@@ -6,14 +6,9 @@ namespace FileUpload.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
         private readonly IWebHostEnvironment hostingEnvironment;
-        public HomeController(ILogger<HomeController> logger, IWebHostEnvironment environment)
-        {
-            _logger = logger;
+        public HomeController(IWebHostEnvironment environment) => 
             hostingEnvironment = environment;
-        }
 
         public IActionResult Index() => View(new Post());
 
@@ -22,11 +17,11 @@ namespace FileUpload.Controllers
         {
             if (post.MyImage == null) return Error();
             //convert name of file into yyyymmddHHSS (if already existing, add iterator)
-            var uniqueFileName = GetUniqueFileName(post.MyImage.FileName);
+            string uniqueFileName = GetUniqueFileName(post.MyImage.FileName);
             // upload file
-            var uploads = Path.Combine(hostingEnvironment.WebRootPath, "uploads");
-            var filePath = Path.Combine(uploads, uniqueFileName);
-            var newfile = new FileStream(filePath, FileMode.CreateNew);
+            string uploads = Path.Combine(hostingEnvironment.WebRootPath, "uploads");
+            string filePath = Path.Combine(uploads, uniqueFileName);
+            FileStream newfile = new(filePath, FileMode.CreateNew);
             post.MyImage.CopyTo(newfile); 
             newfile.Close();
 
@@ -43,9 +38,7 @@ namespace FileUpload.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        public IActionResult Error() => 
+            View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
